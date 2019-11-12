@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Our app API
+Parameters:
+  DeploymentStage:
+    Description: The stage of this deployment
+    Type: String
+    Default: development
+  Name:
+    Description: Name of the RestAPI
+    Type: String
+    Default: test-api
+  TimeStamp:
+    Description: Timestamp of the deployment
+    Type: String
+Resources:
+  RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Description:
+        Ref: Name
+      FailOnWarnings: true
+      Name:
+        Ref: Name
+  UserResource:
+    Type: AWS::ApiGateway::Resource
+    DependsOn:
+      - RestApi
+    Properties:
+      RestApiId: !Ref RestApi
+      ParentId: !GetAtt
+        - RestApi
+        - RootResourceId
+      PathPart: user
+  UserPostTemplate:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - UserResource
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/mktapp.beta.cloudformation.us-east-1/user-post.yaml
+      TimeoutInMinutes: 20
+      Parameters:
+        RestApi: !Ref RestApi
+        ResourceId: !Ref UserResource
+  UserGetTemplate:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - UserResource
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/mktapp.beta.cloudformation.us-east-1/user-get.yaml
+      TimeoutInMinutes: 20
+      Parameters:
+        RestApi: !Ref RestApi
+        ResourceId: !Ref UserResource
+  Deployment${Timestamp}:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - UserPostTemplate
+    Properties:
+      RestApiId:
+        Ref: RestApi
+      StageName:
+        Ref: DeploymentStage
+Outputs:
+  ServerlessDNS:
+    Value:
+      Fn::Join:
+      - "."
+      - - Ref: RestApi
+        - execute-api
+        - Ref: AWS::Region
+        - amazonaws.com
+    Description: Serverless DNS
+  RestApi:
+    Value: !Ref RestApi
+    Export:
+      Name: RestApi
+    Description: RestAPI to use
