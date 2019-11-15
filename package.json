@@ -4,9 +4,8 @@
   "description": "test for api gw",
   "main": "index.js",
   "scripts": {
-    "build": "sh scripts/build.sh",
-    "deploy": "sh scripts/deploy.sh",
-    "prep": "aws s3 cp templates s3://mktapp.beta.cloudformation.us-east-1 --recursive",
+    "build": "source .env-dev && sh scripts/build.sh",
+    "deploy": "source .env-dev && sh scripts/deploy.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

@@ -1,4 +1,4 @@
-s3_bucket=mktapp.beta.cloudformation.us-east-1
+s3_bucket=$S3_BUCKET
 for i in $(find . -name '*.yml'); do
     filename=$(basename $i)
     directory=$(dirname $i)
