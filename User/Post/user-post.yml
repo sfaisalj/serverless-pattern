@@ -7,6 +7,12 @@ Parameters:
   ResourceId:
     Description: ID of the Resource
     Type: String
+  SCG:
+    Description: ID of the Resource
+    Type: String
+  SBN:
+    Description: ID of the Resource
+    Type: String
 Resources:
   UserPostApi:
     Type: AWS::ApiGateway::Method
@@ -25,6 +31,8 @@ Resources:
       ResourceId: !Ref ResourceId
   UserPostLambda:
     Type: AWS::Lambda::Function
+    DependsOn:
+    - UserPostIamRole
     Properties:
       Code: ./
       Description: Function to Get User
@@ -34,6 +42,11 @@ Resources:
       Role: !GetAtt "UserPostIamRole.Arn"
       Runtime: nodejs10.x
       Timeout: 60
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref SCG
+        SubnetIds:
+          - !Ref SBN
   UserPostIamRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -54,6 +67,12 @@ Resources:
                   - "logs:CreateLogGroup"
                   - "logs:CreateLogStream"
                   - "logs:PutLogEvents"
+                Effect: "Allow"
+                Resource: '*'
+              - Action:
+                  - "ec2:CreateNetworkInterface"
+                  - "ec2:DescribeNetworkInterfaces"
+                  - "ec2:DeleteNetworkInterface"
                 Effect: "Allow"
                 Resource: '*'
           PolicyName: "UserPostIamRole"

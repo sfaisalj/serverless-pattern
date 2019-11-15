@@ -12,6 +12,14 @@ Parameters:
   TimeStamp:
     Description: Timestamp of the deployment
     Type: String
+  SubnetIds:
+    Description: Timestamp of the deployment
+    Type: String
+    Default: subnet-07bebd4f75a08876e
+  SecurityGroupIds:
+    Description: Timestamp of the deployment
+    Type: String
+    Default: sg-05f8ec708af8e6784
 Resources:
   RestApi:
     Type: AWS::ApiGateway::RestApi
@@ -41,6 +49,8 @@ Resources:
       Parameters:
         RestApi: !Ref RestApi
         ResourceId: !Ref UserResource
+        SBN: !Ref SubnetIds
+        SCG: !Ref SecurityGroupIds
   UserGetTemplate:
     Type: AWS::CloudFormation::Stack
     DependsOn:
@@ -51,15 +61,18 @@ Resources:
       Parameters:
         RestApi: !Ref RestApi
         ResourceId: !Ref UserResource
-  Deployment${Timestamp}:
-    Type: AWS::ApiGateway::Deployment
-    DependsOn:
-      - UserPostTemplate
-    Properties:
-      RestApiId:
-        Ref: RestApi
-      StageName:
-        Ref: DeploymentStage
+        SBN: !Ref SubnetIds
+        SCG: !Ref SecurityGroupIds
+  # Deployment1:
+  #   Type: AWS::ApiGateway::Deployment
+  #   DependsOn:
+  #     - UserPostTemplate
+  #     - UserGetTemplate
+  #   Properties:
+  #     RestApiId:
+  #       Ref: RestApi
+  #     StageName:
+  #       Ref: DeploymentStage
 Outputs:
   ServerlessDNS:
     Value:

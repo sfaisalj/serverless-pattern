@@ -4,9 +4,8 @@
   "description": "test for api gw",
   "main": "index.js",
   "scripts": {
-    "create": "export STAGE=development; aws cloudformation create-stack --stack-name buynow-api --template-body file://api.yml --parameters ParameterKey=DeploymentStage,ParameterValue=$STAGE ParameterKey=Timestamp,ParameterValue=$TIMESTAMP --capabilities CAPABILITY_NAMED_IAM && aws cloudformation wait stack-create-complete --stack-name buynow-api",
-    "update": "export STAGE=development TIMESTAMP=$(date +%s); aws cloudformation update-stack --stack-name buynow-api --template-body file://api.yml --parameters ParameterKey=DeploymentStage,ParameterValue=$STAGE ParameterKey=TimeStamp,ParameterValue=$TIMESTAMP --capabilities CAPABILITY_NAMED_IAM && aws cloudformation wait stack-update-complete --stack-name buynow-api",
-    "build": "aws cloudformation package --template-file User/Post/user-post.yml --s3-bucket mktapp.beta.cloudformation.us-east-1 --output-template-file templates/user-post.yaml && aws cloudformation package --template-file User/Get/user-get.yml --s3-bucket mktapp.beta.cloudformation.us-east-1 --output-template-file templates/user-get.yaml && npm run prep",
+    "build": "sh scripts/build.sh",
+    "deploy": "sh scripts/deploy.sh",
     "prep": "aws s3 cp templates s3://mktapp.beta.cloudformation.us-east-1 --recursive",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
