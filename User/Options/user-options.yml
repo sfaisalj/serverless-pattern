@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Our app API
+Parameters:
+  RestApi:
+    Description: Name of the RestAPI
+    Type: String
+  ResourceId:
+    Description: ID of the Resource
+    Type: String
+Resources:
+  UserOptionsApi:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      MethodResponses:
+      - StatusCode: 200
+        ResponseParameters:
+          method.response.header.Access-Control-Allow-Methods: true
+          method.response.header.Access-Control-Allow-Headers: true
+          method.response.header.Cache-Control: false
+          method.response.header.Pragma: false
+          method.response.header.Strict-Transport-Security: false
+          method.response.header.Access-Control-Allow-Origin: true
+      Integration:
+        Type: MOCK
+        RequestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        IntegrationResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin : "'*'"
+            method.response.header.Access-Control-Allow-Methods: "'GET'"
+            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+            method.response.header.Cache-Control: "'no-store, no-cache'"
+            method.response.header.Strict-Transport-Security: "'max-age=31536000'"
+            method.response.header.Pragma: "'no-cache'"
+      RestApiId: !Ref RestApi
+      ResourceId: !Ref ResourceId

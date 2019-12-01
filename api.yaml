@@ -61,6 +61,40 @@ Resources:
         ResourceId: !Ref UserResource
         SBN: !Ref SubnetIds
         SCG: !Ref SecurityGroupIds
+  UserPutTemplate:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - UserResource
+    Properties:
+      TemplateURL: !Sub 'https://s3.amazonaws.com/${S3CodeBucket}/user-put.yaml'
+      TimeoutInMinutes: 20
+      Parameters:
+        RestApi: !Ref RestApi
+        ResourceId: !Ref UserResource
+        SBN: !Ref SubnetIds
+        SCG: !Ref SecurityGroupIds
+  UserDeleteTemplate:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - UserResource
+    Properties:
+      TemplateURL: !Sub 'https://s3.amazonaws.com/${S3CodeBucket}/user-delete.yaml'
+      TimeoutInMinutes: 20
+      Parameters:
+        RestApi: !Ref RestApi
+        ResourceId: !Ref UserResource
+        SBN: !Ref SubnetIds
+        SCG: !Ref SecurityGroupIds
+  UserOptionsTemplate:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - UserResource
+    Properties:
+      TemplateURL: !Sub 'https://s3.amazonaws.com/${S3CodeBucket}/user-options.yaml'
+      TimeoutInMinutes: 20
+      Parameters:
+        RestApi: !Ref RestApi
+        ResourceId: !Ref UserResource
 Outputs:
   ServerlessDNS:
     Value:

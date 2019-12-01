@@ -14,70 +14,32 @@ Parameters:
     Description: ID of the Resource
     Type: String
 Resources:
-  UserModelRequestValidator:
-    Type: AWS::ApiGateway::RequestValidator
-    Properties:
-      Name: UserModelRequestValidator
-      RestApiId: !Ref RestApi
-      ValidateRequestBody: true
-      ValidateRequestParameters: true
-  UserPostModel:
-    Type: AWS::ApiGateway::Model
-    Properties:
-      RestApiId: !Ref RestApi
-      ContentType: "application/json"
-      Description: "User Post Model"
-      Name: UserPostModel
-      Schema:
-        $schema: 'http://json-schema.org/draft-04/schema#'
-        title: UserPostModel
-        type: object
-        additionalProperties: false
-        required:
-          - name
-          - age
-          - username
-        properties:
-          name:
-            type: string
-          age:
-            type: integer
-            pattern: "^[ -~]{1,17}$"
-          username:
-            type: string
-  UserPostApi:
+  UserDeleteApi:
     Type: AWS::ApiGateway::Method
     DependsOn:
-    - UserPostLambda
-    - UserModelRequestValidator
-    - UserPostModel
+    - UserDeleteLambda
     Properties:
-      HttpMethod: POST
+      HttpMethod: DELETE
       AuthorizationType: NONE
-      RequestModels:
-        "application/json": !Ref UserPostModel
-      RequestValidatorId: !Ref UserModelRequestValidator
-      RequestParameters:
-        method.request.header.content-type: true
       Integration:
         IntegrationHttpMethod: "POST"
         Type: "AWS_PROXY"
         Uri: !Sub
           - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
-          - lambdaArn: !GetAtt "UserPostLambda.Arn"
+          - lambdaArn: !GetAtt "UserDeleteLambda.Arn"
       RestApiId: !Ref RestApi
       ResourceId: !Ref ResourceId
-  UserPostLambda:
+  UserDeleteLambda:
     Type: AWS::Lambda::Function
     DependsOn:
-    - UserPostIamRole
+    - UserDeleteIamRole
     Properties:
       Code: ./
       Description: Function to Get User
-      FunctionName: UserPost
+      FunctionName: UserDelete
       Handler: index.handler
       MemorySize: 128
-      Role: !GetAtt "UserPostIamRole.Arn"
+      Role: !GetAtt "UserDeleteIamRole.Arn"
       Runtime: nodejs10.x
       Timeout: 60
       VpcConfig:
@@ -85,7 +47,7 @@ Resources:
           - !Ref SCG
         SubnetIds:
           - !Ref SBN
-  UserPostIamRole:
+  UserDeleteIamRole:
     Type: "AWS::IAM::Role"
     Properties:
       AssumeRolePolicyDocument:
@@ -104,7 +66,7 @@ Resources:
               - Action:
                   - "logs:CreateLogGroup"
                   - "logs:CreateLogStream"
-                  - "logs:PutLogEvents"
+                  - "logs:DeleteLogEvents"
                 Effect: "Allow"
                 Resource: '*'
               - Action:
@@ -113,10 +75,10 @@ Resources:
                   - "ec2:DeleteNetworkInterface"
                 Effect: "Allow"
                 Resource: '*'
-          PolicyName: "UserPostIamRole"
-  UserPostApiGatewayInvoke:
+          PolicyName: "UserDeleteIamRole"
+  UserDeleteApiGatewayInvoke:
     Type: "AWS::Lambda::Permission"
     Properties:
       Action: "lambda:InvokeFunction"
-      FunctionName: !GetAtt "UserPostLambda.Arn"
+      FunctionName: !GetAtt "UserDeleteLambda.Arn"
       Principal: "apigateway.amazonaws.com"

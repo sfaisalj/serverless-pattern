@@ -1,5 +1,5 @@
 s3_bucket=$S3_BUCKET
-for i in $(find . -name '*.yml'); do
+for i in $(find . -name '*.yml' '!' -path '.*/.aws-sam/*'); do
     filename=$(basename $i)
     directory=$(dirname $i)
     yml_to_yaml=${filename/yml/yaml}

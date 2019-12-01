@@ -5,7 +5,7 @@ exports.handler = async function(event, context) {
     "headers": {
         "Content-Type": "*/*"
     },
-    "body": "Faisal just Posted"
+    "body": "Faisal just Putted"
   };
   return res;
 }
